@@ -61,7 +61,19 @@ Route::group(['middleware' => ['auth','giangvien']], function () {
           
 });
 
+Route::group(['middleware' => ['auth','sinhvien']], function () {
+  //  Route::get('/',[MainController::class,'trang_chu'])->name('trangchu');
 
+    Route::get('/danh_sach_lop_hoc',[SinhVienController::class,'DS_Lophoccuasinhvien'])->name('DS_Lophoccuasinhvien');
+
+    Route::get('/tham_gia_lop_hoc',[SinhVienController::class,'tham_gia_lop_hoc'])->name('tham_gia_lop_hoc');
+    Route::post('/tham_gia_lop_hoc',[SinhVienController::class,'xl_tham_gia_lop_hoc'])->name('xl_tham_gia_lop_hoc');
+
+    Route::get('/huy_lop_hoc/{id}',[SinhVienController::class,'huy_lop_hoc'])->name('huy_lop_hoc');
+
+    Route::get('/layTenGiangVien/{id}',[SinhVienController::class,'layTenGiangVien'])->name('layTenGiangVien');
+
+});
 
 Route::group(['middleware' => ['auth']], function () {
 Route::get('/quen_mat_khau',[GiangVienController::class,'quen_mat_khau'])->name('quen_mat_khau');

@@ -29,8 +29,8 @@ class AccountController extends Controller
             }
             if($user->account_type_id==2)  
             {
-                
-                return "View của sinh viên";
+                $ds= $user->danhSachLopHocCuaSinhVien;
+                return view("sinh_vien/sinh_vien_main",compact("ds"));
             }
             if($user->account_type_id==3)  
             {
