@@ -57,8 +57,14 @@ Route::group(['middleware' => ['auth','giangvien']], function () {
       Route::post('/Danh_sach_sinh_vien_trong_lop/{sinhvien_id}/{lophoc_id}',[GiangVienController::class,'xl_Danh_sach_sinh_vien_trong_lop'])->name('xl_Danh_sach_sinh_vien_trong_lop');
       
       Route::post('/Danh_sach_sinh_vien_trong_lop/{id}',[GiangVienController::class,'xl_tim_kiem_sinh_vien_trong_lop'])->name('xl_tim_kiem_sinh_vien_trong_lop');
+      
+      Route::get('/taipdf',[GiangVienController::class,'taipdf'])->name('taipdf');
+      Route::post('/taipdf',[GiangVienController::class,'xl_taipdf'])->name('xl_taipdf');
 
-          
+      Route::get('/baitap/{idlophoc}',[GiangVienController::class,'baitap'])->name('baitap');
+
+      Route::get('/xoabaigiang/{idbaigiang}',[GiangVienController::class,'xoabaigiang'])->name('xoabaigiang');
+
 });
 
 Route::group(['middleware' => ['auth','sinhvien']], function () {
@@ -89,6 +95,22 @@ Route::post('/doi_thong_tin',[GiangVienController::class,'xl_doi_thong_tin'])->n
 
 Route::get('/dang_xuat',[AccountController::class,'dangxuat'])->name('dang_xuat');
 Route::get('/Đừng có đi lung tung',[MainController::class,'trang_chu'])->name('trangchu');
+
+
+Route::get('/chitietlophoc/{id}',[GiangVienController::class,'chitietlophoc'])->name('chitietlophoc');
+Route::post('/chitietlophoc/{id}',[GiangVienController::class,'xl_chitietlophoc'])->name('xl_chitietlophoc');
+
+Route::post('/thembaigiang/{id}/{loaibai}',[GiangVienController::class,'xl_thembaigiang'])->name('xl_thembaigiang');
+
+Route::get('/chayFilePDF/{text}',[GiangVienController::class,'chayFilePDF'])->name('chayFilePDF');
+
+Route::post('/thembinhluan/{id}',[GiangVienController::class,'thembinhluan'])->name('thembinhluan');
+
+Route::post('/suabinhluan/{id}',[GiangVienController::class,'suabinhluan'])->name('suabinhluan');
+Route::get('/xoabinhluan/{id}/{idaccount}',[GiangVienController::class,'xoabinhluan'])->name('xoabinhluan');
+
+Route::post('/chi_tiet_bai_tap/{idlophoc}',[GiangVienController::class,'chi_tiet_bai_tap'])->name('chi_tiet_bai_tap');
+Route::get('/chi_tiet_bai_tap/{idlophoc}/{idaccount}',[GiangVienController::class,'xl_chi_tiet_bai_tap'])->name('xl_chi_tiet_bai_tap');
 });
 
 Route::get('/dang_nhap',[AccountController::class,'dang_nhap'])->name('dang_nhap')->middleware('guest');

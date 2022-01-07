@@ -1,5 +1,3 @@
-
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -94,7 +92,7 @@
                                         {{ session('error') }}
                                     </div>
                                     @endif    </h5>
-      <h3 style="color: black; text-align: center;">Xin chào Giáo Viên {{Illuminate\Support\Facades\Auth::user()->name}}    </h3><br />
+    
    <div class="container-fluid">
    <i class="fas fa-ellipsis-h"></i>
    
@@ -130,19 +128,19 @@
                </a>
              <div class="dropdown-menu dropdown-menu-right" >
                <a class="dropdown-item" href="{{route('sua_lop_hoc',['id'=>$p->id])}}">Sửa lớp học</a>
-               <a class="dropdown-item" href="{{route('xl_xoa_lop_hoc',['id'=>$p->id])}}">Xóa lớp học</a>
+               <a class="dropdown-item confirmation" href="{{route('xl_xoa_lop_hoc',['id'=>$p->id])}}">Xóa lớp học</a>
                <a class="dropdown-item" href="{{route('Duyet_danh_Sach_cho',['id'=>$p->id])}}">Duyệt sinh viên</a>
                <a class="dropdown-item" href="{{route('Danh_sach_sinh_vien_trong_lop',['id'=>$p->id])}}">Danh sách sinh viên</a>
              </div>
             </li>
          </ul>
-                        <a href="{{$p->id}}"><p class="card-title text- dark" style="color: Black">{{$p->tenlop}} </p></a>
+                        <a href="{{route('chitietlophoc',['id'=>$p->id,'loaibai'=>1])}}"><p class="card-title text- dark" style="color: Black">{{$p->tenlop}} </p></a>
                         <p>{{$p->tieude}}</p>
                      </h4>
                    </div>
                   
                   <div class="card-body">
-                     <h5 class="card-title">Mã vào lớp :{{$p->mavaolop}}</h5>
+                     <h5 class="card-title">Mã vào lớp : {{$p->mavaolop}}</h5>
                      <p class="card-text">
                         Some quick example text to build on the card
                         title and make up the bulk of the card's content.
@@ -157,3 +155,9 @@
    </div>
 </body>
 </html>
+
+<script type="text/javascript">
+    $('.confirmation').on('click', function () {
+        return confirm('Bạn có chắc chắn muốn xóa?');
+    });
+</script>

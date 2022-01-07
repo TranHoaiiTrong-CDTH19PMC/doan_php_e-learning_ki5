@@ -17,7 +17,7 @@
         <form class="modal-content animate" action="{{route('xl_doi_mat_khau')}}" method="post">
             @csrf
             <div class="container">
-            <a href="{{route('ds_lop')}}" class="btnCancel">Thoát</a></br>
+            <a href="{{route('trangchu')}}" class="btnCancel">Thoát</a></br>
                 <h2>Thay đổi mật khẩu</h2> 
                 <label for="pw1"><b>Mật khẩu hiện tại</b></label>
                 <input type="password" placeholder="Nhập mật khẩu hiện tại" name='pw1' required>

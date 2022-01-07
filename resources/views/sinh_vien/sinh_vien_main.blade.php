@@ -105,7 +105,7 @@
                                         {{ session('error') }}
                                     </div>
                                     @endif  </h5>
-      <h3 style="color: black; text-align: center;">Xin chào sinh viên {{Illuminate\Support\Facades\Auth::user()->name}}</h3><br />
+ 
    <div class="container-fluid">
  
          <div class = "row">
@@ -140,14 +140,14 @@
              </div>
             </li>
          </ul>
-                        <a href="{{$p->id}}"><h5 class="card-title text- dark">{{$p->tenlop}} </h5></a>
+         <a href="{{route('xl_chitietlophoc',['id'=>$p->id,'loaibai'=>1])}}"><p class="card-title text- dark" style="color: Black">{{$p->tenlop}} </p></a>
                         <p>{{$p->tieude}}</p>
                         <p>Giáo viên : {{App\Models\account::find($p->giangvien_id)->name}}</p>
                      </h4>
                    </div>
                   
                   <div class="card-body">
-                     <h5 class="card-title">Mã vào lớp :{{$p->mavaolop}}</h5>
+                     <h5 class="card-title">Mã vào lớp : {{$p->mavaolop}}</h5>
                      <p class="card-text">
                         Some quick example text to build on the card
                         title and make up the bulk of the card's content.

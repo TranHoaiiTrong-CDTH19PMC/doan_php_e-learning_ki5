@@ -20,7 +20,7 @@
             @csrf
             <div class="container">
                 <h2>Thay đổi thông tin cá nhân</h2> 
-                <a href="{{route('ds_lop')}}" class="btnCancel">Thoát</a></br>
+                <a href="{{route('trangchu')}}" class="btnCancel">Thoát</a></br>
                <div>
             </div>
                 <label for="pw2"><b>Username</b></label>

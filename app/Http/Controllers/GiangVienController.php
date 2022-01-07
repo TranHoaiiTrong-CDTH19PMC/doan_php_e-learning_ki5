@@ -1,9 +1,13 @@
 <?php
 
 namespace App\Http\Controllers;
+date_default_timezone_set('Asia/Ho_Chi_Minh');
 use App\Models\account;
 use App\Models\lophoc;
 use App\Models\lophoc_sinhvien;
+use App\Models\baigiang;
+use App\Models\tepdinhkem;
+use App\Models\comment;
 use Illuminate\Http\Request;
 use App\Http\Requests\GiaoVienRequest;
 use App\Http\Requests\themlophocRequest;
@@ -12,33 +16,9 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
 use App\Http\Requests\ktEmailRequest;
 use App\Http\Controllers\window;
+use Illuminate\Support\Str;
 class GiangVienController extends Controller
 {
-
-    public function guimail()
-    {
-        $data=[
-            "name"=>"quang vinh",
-        ];
-        Mail::send('elearning/email',$data,function($mes){
-            $mes->from("dangquangvinh20188@gmail.com","quang vin gửi 1");
-            $mes->to("0306191292@caothang.edu.vn","hihi");
-            $mes->subject("Thư gửi mẫu");
-        });
-    }
-
-    public function kiemtra()
-    {
-        $user = Auth::user();
-        if($user->account_type_id==1)  
-        {
-            return true;
-        }
-        else{
-            return redirect()->route("trangchu");
-        }
-    }
-
     public function ds_lop()
     {
         $user = Auth::user();
@@ -80,15 +60,16 @@ class GiangVienController extends Controller
         $lop=new lophoc;
         $lop->giangvien_id=$user->id;
         $lop->tenlop=$a->name;
-       $code= rand(10000,99999);
+       $code= Str::random(10);
+ 
        do{
         $lop->mavaolop=$code;
        $kt= lophoc::where("mavaolop","$code")->count();
-       $code= rand(10000,99999 );
+       $code=Str::random(10);
        }
        while($kt>0);
-    
         $lop->tieude=$a->tieu_de;
+
         if($a->hinh_nen==null)
         {
             $lop->hinh_nen="a4.jpg";
@@ -131,7 +112,17 @@ class GiangVienController extends Controller
         }
         return redirect()->route("ds_lop")->with('error','Sửa lớp học thành công'); 
     }
-    
+    public function xoabaigiang($idbaigiang)
+    {
+        $baigiang=baigiang::find($idbaigiang);
+        $danhsachbinhluan=comment::where('baigiang_id',"$idbaigiang")->get();
+        foreach($danhsachbinhluan as $bl)
+        {
+            $bl->delete();
+        }
+        $baigiang->delete();
+        return back();
+    }
     public function xl_xoa_lop_hoc( $id)
     {
         $danhsachsinhvien=lophoc_sinhvien::where("lophoc_id",$id)->get();
@@ -139,6 +130,19 @@ class GiangVienController extends Controller
         {
             $p->delete();
         }
+
+        $danhsachbaigiang=baigiang::where("lophoc_id",$id)->get();
+        foreach($danhsachbaigiang as $baigiang)
+        {
+                $baigiang=baigiang::find($baigiang->id);
+            $danhsachbinhluan=comment::where('baigiang_id',"$baigiang->id")->get();
+            foreach($danhsachbinhluan as $bl)
+            {
+                $bl->delete();
+            }
+            $baigiang->delete();
+        }
+
         $user=lophoc::find($id);
         $user->delete();
         return redirect()->route("ds_lop")->with('error','Xoá lớp học thành công'); 
@@ -261,8 +265,6 @@ class GiangVienController extends Controller
     return view("giao_vien/Danh_Sach_sinh_vien_trong_lop",compact("ds"),compact('cc'));
    }
 
-
-
     public function them_sinh_vien_vao_lop($id)
     {
        
@@ -327,6 +329,144 @@ class GiangVienController extends Controller
     }
          return redirect()->route("Danh_sach_sinh_vien_trong_lop",["id"=>$id])->with('thanhcong',"Bạn đã thêm thành công $dem sinh viên");   
     }
+    public function taipdf()
+    {
+        return view("giao_vien/pdf");
+    }
+    public function xl_taipdf(Request $req)
+    {
+        $duoi=$req->file('file_pdf')->extension();
+        if($req->file_pdf==null)
+        {
+            return "Mày định bịp à";
+        }
+        elseif($duoi=="pdf"|| $duoi="docx"){
+            $image=$req->file('file_pdf');
+            $file_name=time().'.'.$duoi;
+            $path = $image->storeAs('file_pdf',$file_name);
+            return response()->file("./app/file_pdf/$file_name");   
+        }
+    }
+    public function chitietlophoc($id ,Request $request)
+    {
+        $loaibai=$request->query('loaibai');
+        $lophoc=lophoc::where("id","$id")->first();
+       $baigiang=baigiang::where("lophoc_id","$id")->where("loaibai_id",$loaibai)->get();
+       if($loaibai==1)
+       {
+        return view("elearning/danh_sach_bang_tin",compact("lophoc","baigiang"));
+       }
+       if($loaibai==2)
+       {
+        return view("elearning/danh_sach_bai_tap",compact("lophoc","baigiang"));
+       }
+      
+    }
+    public function xl_thembaigiang(Request $req,$id,$loaibai)
+    {
+        if($req->file('file_pdf')!=null)
+      {
+        $duoi=$req->file('file_pdf')->extension();
+        if($duoi=="pdf")
+        {
+        $addbaigiang=new baigiang;
+        $addbaigiang->lophoc_id=$id;
+        $addbaigiang->loaibai_id=$loaibai;
+        if(empty($req->tieude))
+        {
+            $addbaigiang->tieude="";
+        }else{
+            $addbaigiang->tieude=$req->tieude;
+        }
+     
+      if(empty($req->noidung))
+      {
+        return back()->with('error',"Bạn nhập thiếu nội dung rồi !");   
+      }
+      $addbaigiang->noidung=$req->noidung;
+      if(empty($req->ngayhethan))
+      {
+        $addbaigiang->ngayhethan=date("Y-m-d H:i:s");
+      }
+      else{
+        $addbaigiang->ngayhethan=$req->ngayhethan;
+      }
+
+      $addbaigiang->save();
+      
+        $addtep=new tepdinhkem;
+        $image=$req->file('file_pdf');
+        $file_name=time().'.'.$duoi;
+        $path = $image->storeAs('file_pdf',$file_name);
+        $addtep->linktep=$file_name;
+        $addtep->baigiang_id=baigiang::all()->max('id');
+        $addtep->save();
+        return back();
+        }else{
+            return back()->with('error',"Bạn chỉ được sử dụng file có đuôi .pdf !");   
+        }
+}
+      else{
+        $addbaigiang=new baigiang;
+        $addbaigiang->lophoc_id=$id;
+        $addbaigiang->loaibai_id=$loaibai;
+        if(empty($req->tieude))
+        {
+            $addbaigiang->tieude="";
+        }else{
+            $addbaigiang->tieude=$req->tieude;
+        }
+      if(empty($req->noidung))
+      {
+        return back()->with('error',"Bạn nhập thiếu nội dung rồi !");   
+      }
+      $addbaigiang->noidung=$req->noidung;
+      if(empty($req->ngayhethan))
+      {
+        $addbaigiang->ngayhethan=date("Y-m-d H:i:s");
+      }
+      else{
+        $addbaigiang->ngayhethan=$req->ngayhethan;
+      }
+      $addbaigiang->save();
+      return redirect()->route('xl_chitietlophoc',['id'=>$id,'loaibai'=>$loaibai]);
+      }
+    }
+
+
+
+
+    public function chayFilePDF($text)
+    {
+        return response()->file("./app/file_pdf/$text");   
+    }
+    public function thembinhluan(Request $req,$idbaigiang)
+    {
+            $addcomment=new comment;
+            $addcomment->account_id= Auth::user()->id;
+            $addcomment->baigiang_id=$idbaigiang;
+            $addcomment->noidung=$req->comment;
+            $addcomment->save();
+        return back();
+    }
+    public function xoabinhluan($id,$idaccount)
+    {
+        if($idaccount==Auth::user()->id)
+        {
+        $xoacomment=comment::find($id);
+        $xoacomment->delete();
+        return back();
+    }
+        return back()->with('loicomment',"Bạn không có quyền xoá bình luận này!");   
+    }
+    public function baitap($idlophoc)
+    {
+        $lophoc=lophoc::find($idlophoc);
+        return view("giao_vien/them_bai_tap",compact('lophoc'));
+    }
+
+   
+  
 }
 
 
